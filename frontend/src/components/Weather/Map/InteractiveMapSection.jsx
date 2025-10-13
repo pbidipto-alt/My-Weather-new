@@ -2,13 +2,14 @@
 import { motion } from "motion/react";
 import { Map as MapIcon } from "lucide-react";
 
+
 export function InteractiveMapSection({ onShowMap }) {
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.6 }}
-      whileHover={{ scale: 1.01 }}
+      
       className="bg-white/95 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20"
     >
       <div className="flex items-center justify-between mb-6">

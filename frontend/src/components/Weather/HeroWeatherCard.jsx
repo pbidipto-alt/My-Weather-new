@@ -90,7 +90,7 @@ export function HeroWeatherCard({ current, today, location, displayName }) {
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.1 }}
-      whileHover={{ scale: 1.01, y: -4 }}
+      
       className="relative overflow-hidden bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 min-h-[600px]"
     >
       {/* Continuous Animated Gradient Background */}
