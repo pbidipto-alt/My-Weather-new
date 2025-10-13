@@ -8,7 +8,7 @@ A modern, fully-featured weather application built with React and Node.js, featu
 - 7-day weather forecast with hourly breakdowns
 - Interactive weather maps
 - Location search with history
-- Favorites feature with local SQLite database
+- Favorites feature with in-memory storage
 - Detailed weather metrics (humidity, pressure, wind, visibility, etc.)
 - Responsive design
 - Fast local setup with no external dependencies
@@ -50,7 +50,7 @@ The application will be available at:
 
 - **Frontend**: React 18 with Vite
 - **Backend**: Node.js with Express
-- **Database**: SQLite (local file-based)
+- **Storage**: In-memory cache (no database required)
 - **Styling**: Tailwind CSS
 - **Charts**: Recharts
 - **Maps**: Google Maps API
@@ -68,7 +68,7 @@ weather-app/
 │   └── package.json
 ├── backend/           # Node.js + Express API
 │   ├── routes/
-│   ├── db/
+│   ├── cache.js       # In-memory storage
 │   └── package.json
 └── package.json       # Root package with setup scripts
 ```
@@ -89,13 +89,13 @@ The backend includes a demo API key. To use your own:
 1. Edit `backend/.env`
 2. Replace `VISUAL_CROSSING_API_KEY` with your key from [Visual Crossing](https://www.visualcrossing.com/weather-api)
 
-## Database
+## Data Storage
 
-The app uses SQLite for local data storage. The database file is automatically created at `backend/db/weather.db` on first run.
+The app uses in-memory storage for temporary data persistence during runtime. Data includes:
+- Favorite locations
+- Location search history
 
-Tables:
-- `favorites` - User favorite locations
-- `search_history` - Location search history
+Note: Data is not persisted between server restarts.
 
 ## License
 
