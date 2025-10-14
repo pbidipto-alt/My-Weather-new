@@ -11,10 +11,31 @@ router.get('/search', async (req, res) => {
       return res.status(400).json({ error: 'Search query must be at least 2 characters' });
     }
 
+    const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=10&language=en&format=json`;
+
+    const response = await fetch(geocodeUrl);
+
+    if (!response.ok) {
+      throw new Error(`Geocoding API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    const suggestions = (data.results || []).map(result => ({
+      id: `${result.latitude}-${result.longitude}`,
+      name: result.name,
+      main_text: result.name,
+      secondary_text: [result.admin1, result.country].filter(Boolean).join(', '),
+      latitude: result.latitude,
+      longitude: result.longitude,
+      country: result.country,
+      region: result.admin1
+    }));
+
     const searchHistory = cache.searchHistory.get(q);
 
     res.json({
-      suggestions: [],
+      suggestions,
       history: searchHistory
     });
   } catch (error) {

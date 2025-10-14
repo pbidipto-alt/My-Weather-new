@@ -49,16 +49,15 @@ export default function LocationSearch({ onClose, onLocationSelect }) {
   };
 
   const handleLocationSelect = async (location) => {
-    // Extract location data
     const locationData = {
-      name: location.main_text || location.city_name || location.description,
-      region: location.secondary_text || location.region,
-      country: location.country,
-      lat: location.latitude,
-      lon: location.longitude
+      name: location.name || location.main_text || location.city_name || location.description,
+      displayName: location.name || location.main_text || location.city_name,
+      lat: location.lat || location.latitude,
+      lon: location.lon || location.longitude,
+      region: location.region,
+      country: location.country
     };
 
-    // Save to search history
     if (searchQuery && locationData.name) {
       try {
         await fetch('/api/locations/search', {
@@ -205,12 +204,12 @@ export default function LocationSearch({ onClose, onLocationSelect }) {
             <h3 className="text-sm font-medium text-white/70 mb-3">Popular Locations</h3>
             <div className="space-y-2">
               {[
-                { name: 'New York', region: 'NY, USA', lat: 40.7128, lon: -74.0060 },
-                { name: 'London', region: 'England, UK', lat: 51.5074, lon: -0.1278 },
-                { name: 'Tokyo', region: 'Japan', lat: 35.6762, lon: 139.6503 },
-                { name: 'Paris', region: 'France', lat: 48.8566, lon: 2.3522 },
-                { name: 'Sydney', region: 'NSW, Australia', lat: -33.8688, lon: 151.2093 }
-              ].map((location, index) => (
+                { name: 'New York', region: 'New York', country: 'United States', lat: 40.7128, lon: -74.0060 },
+                { name: 'London', region: 'England', country: 'United Kingdom', lat: 51.5074, lon: -0.1278 },
+                { name: 'Tokyo', region: 'Tokyo', country: 'Japan', lat: 35.6762, lon: 139.6503 },
+                { name: 'Paris', region: 'Île-de-France', country: 'France', lat: 48.8566, lon: 2.3522 },
+                { name: 'Sydney', region: 'New South Wales', country: 'Australia', lat: -33.8688, lon: 151.2093 }
+              ].map((location) => (
                 <motion.button
                   key={location.name}
                   whileHover={{ scale: 1.01 }}
@@ -220,7 +219,7 @@ export default function LocationSearch({ onClose, onLocationSelect }) {
                   <MapPin className="w-4 h-4 text-white/60" />
                   <div>
                     <p className="font-medium">{location.name}</p>
-                    <p className="text-sm text-white/60">{location.region}</p>
+                    <p className="text-sm text-white/60">{location.region}, {location.country}</p>
                   </div>
                 </motion.button>
               ))}
