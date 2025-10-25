@@ -65,6 +65,26 @@ export function ForecastChart({
   const config = chartConfigs[activeChart];
   const {dataKey, secondaryKey, secondaryName, tertiaryKey, tertiaryName} = getChartDataKeys(forecastPeriod, activeChart);
 
+  const getTemperatureDomain = () => {
+    if (activeChart !== 'temperature') return undefined;
+
+    const temps = chartData.flatMap(item => [
+      item.temperature,
+      item.tempMax,
+      item.tempMin,
+      item.feelsLike
+    ].filter(t => t !== undefined && t !== null));
+
+    const minTemp = Math.min(...temps);
+
+    if (minTemp < 0) {
+      return [-45, 10];
+    }
+    return [0, 55];
+  };
+
+  const yAxisDomain = getTemperatureDomain();
+
   return (
     <>
       <div className="flex flex-wrap items-center space-x-2 mb-6">
@@ -104,7 +124,7 @@ export function ForecastChart({
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" strokeOpacity={0.3} />
               <XAxis dataKey={xKey} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748B", fontWeight: 600 }} interval="preserveStartEnd" />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748B", fontWeight: 600 }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#64748B", fontWeight: 600 }} domain={yAxisDomain} />
               <Tooltip content={<CustomTooltip activeChart={activeChart} />} />
               <Area type="monotone" dataKey={dataKey} stroke={config.stroke} strokeWidth={3} fill={`url(#gradient-${activeChart})`} dot={{ fill: config.stroke, strokeWidth: 2, r: 5 }} activeDot={{ r: 8, stroke: config.stroke, strokeWidth: 3, fill: "#fff" }} name={config.name} />
               {secondaryKey && (
