@@ -37,22 +37,6 @@ export default function WeatherChart({ weatherData, units }) {
 
   const hourlyData = generateHourlyData();
 
-  const getYAxisDomain = () => {
-    if (!hourlyData.length) return [0, 55];
-
-    const temps = hourlyData.flatMap(item => [
-      item.temperature,
-      item.feelslike
-    ].filter(t => t !== undefined && t !== null));
-
-    const minTemp = Math.min(...temps);
-
-    if (minTemp < 0) {
-      return [-45, 10];
-    }
-    return [0, 55];
-  };
-
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -94,7 +78,7 @@ export default function WeatherChart({ weatherData, units }) {
             tick={{ fill: "rgba(255, 255, 255, 0.6)", fontSize: 11 }}
             interval={2}
           />
-          <YAxis hide domain={getYAxisDomain()} />
+          <YAxis hide />
           <Tooltip content={<CustomTooltip />} />
           <Area
             type="monotone"
