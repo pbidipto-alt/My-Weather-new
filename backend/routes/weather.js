@@ -2,6 +2,7 @@ import express from 'express';
 
 const router = express.Router();
 const VISUAL_CROSSING_API_KEY = process.env.VISUAL_CROSSING_API_KEY || '8L4Y4RLAT733984N2Y79EVHRQ';
+const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY || 'e3f1e1c6c7e0ee3e3c3c3e3e3c3c3e3e';
 
 router.get('/visual-crossing', async (req, res) => {
   try {
@@ -20,6 +21,24 @@ router.get('/visual-crossing', async (req, res) => {
     }
 
     const data = await response.json();
+
+    let aqiData = null;
+    try {
+      const aqiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${data.latitude}&lon=${data.longitude}&appid=${OPENWEATHER_API_KEY}`;
+      const aqiResponse = await fetch(aqiUrl);
+      if (aqiResponse.ok) {
+        const aqiJson = await aqiResponse.json();
+        if (aqiJson.list && aqiJson.list.length > 0) {
+          const aqiInfo = aqiJson.list[0];
+          aqiData = {
+            aqi: aqiInfo.main.aqi,
+            components: aqiInfo.components
+          };
+        }
+      }
+    } catch (aqiError) {
+      console.error('AQI fetch error:', aqiError);
+    }
 
     const transformedData = {
       location: {
@@ -53,7 +72,8 @@ router.get('/visual-crossing', async (req, res) => {
         icon: data.currentConditions.icon,
         sunrise: data.currentConditions.sunrise,
         sunset: data.currentConditions.sunset,
-        moonphase: data.currentConditions.moonphase
+        moonphase: data.currentConditions.moonphase,
+        aqi: aqiData
       },
       days: data.days.map(day => ({
         datetime: day.datetime,

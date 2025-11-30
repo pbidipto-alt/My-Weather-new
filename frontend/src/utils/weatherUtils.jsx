@@ -83,3 +83,14 @@ export const prepareDailyChartData = (weatherData) => {
       conditions: day.conditions,
     }));
 };
+
+export const getAQIInfo = (aqiValue) => {
+  if (!aqiValue) return { level: "N/A", color: "gray", value: "N/A" };
+
+  if (aqiValue === 1) return { level: "Good", color: "green", value: aqiValue };
+  if (aqiValue === 2) return { level: "Fair", color: "yellow", value: aqiValue };
+  if (aqiValue === 3) return { level: "Moderate", color: "orange", value: aqiValue };
+  if (aqiValue === 4) return { level: "Poor", color: "red", value: aqiValue };
+  if (aqiValue === 5) return { level: "Very Poor", color: "red", value: aqiValue };
+  return { level: "Unknown", color: "gray", value: "N/A" };
+};

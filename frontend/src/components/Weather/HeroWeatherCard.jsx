@@ -11,7 +11,7 @@ import {
   Gauge,
   Shield,
 } from "lucide-react";
-import { getWeatherIcon } from "@/utils/weatherUtils";
+import { getWeatherIcon, getAQIInfo } from "@/utils/weatherUtils";
 
 const QuickStat = ({ icon: Icon, label, value, color, subtitle }) => (
   <motion.div
@@ -28,28 +28,9 @@ const QuickStat = ({ icon: Icon, label, value, color, subtitle }) => (
 export function HeroWeatherCard({ current, today, location, displayName }) {
   if (!current || !today || !location) return null;
 
-  // Calculate AQI based on current conditions (simulated for now)
-  const calculateAQI = () => {
-    // Simple AQI calculation based on weather conditions and humidity
-    const baseAQI = 50;
-    const humidityFactor = (current.humidity - 50) * 0.5;
-    const visibilityFactor = (10 - current.visibility) * 5;
-    const calculatedAQI = Math.max(
-      20,
-      Math.min(150, baseAQI + humidityFactor + visibilityFactor),
-    );
-    return Math.round(calculatedAQI);
-  };
-
-  const aqi = calculateAQI();
-  const getAQILevel = (aqi) => {
-    if (aqi <= 50) return { level: "Good", color: "green" };
-    if (aqi <= 100) return { level: "Moderate", color: "yellow" };
-    if (aqi <= 150)
-      return { level: "Unhealthy for Sensitive", color: "orange" };
-    return { level: "Unhealthy", color: "red" };
-  };
-  const aqiInfo = getAQILevel(aqi);
+  const aqiValue = current.aqi?.aqi;
+  const aqiInfo = getAQIInfo(aqiValue);
+  const aqiDisplay = aqiValue ? `${aqiValue}` : "N/A";
 
   const quickStats = [
     {
@@ -79,7 +60,7 @@ export function HeroWeatherCard({ current, today, location, displayName }) {
     {
       icon: Shield,
       label: "Air Quality",
-      value: `${aqi} AQI`,
+      value: aqiDisplay,
       color: aqiInfo.color,
       subtitle: aqiInfo.level,
     },
