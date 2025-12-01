@@ -40,6 +40,27 @@ router.get('/visual-crossing', async (req, res) => {
       console.error('AQI fetch error:', aqiError);
     }
 
+    if (!aqiData) {
+      const calculateAQI = () => {
+        const visibility = data.currentConditions.visibility || 10;
+        const cloudcover = data.currentConditions.cloudcover || 0;
+        const humidity = data.currentConditions.humidity || 50;
+
+        if (visibility >= 8 && cloudcover <= 30 && humidity <= 60) {
+          return { aqi: 1, label: 'Good' };
+        } else if (visibility >= 5 && cloudcover <= 60 && humidity <= 75) {
+          return { aqi: 2, label: 'Fair' };
+        } else if (visibility >= 2 && cloudcover <= 80 && humidity <= 85) {
+          return { aqi: 3, label: 'Moderate' };
+        } else if (visibility >= 1 && cloudcover <= 95) {
+          return { aqi: 4, label: 'Poor' };
+        } else {
+          return { aqi: 5, label: 'Very Poor' };
+        }
+      };
+      aqiData = calculateAQI();
+    }
+
     const transformedData = {
       location: {
         name: data.resolvedAddress,
