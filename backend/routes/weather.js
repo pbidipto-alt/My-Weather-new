@@ -24,15 +24,28 @@ router.get('/visual-crossing', async (req, res) => {
 
     let aqiData = null;
     try {
-      const aqiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${data.latitude}&lon=${data.longitude}&appid=${OPENWEATHER_API_KEY}`;
+      const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${data.latitude}&longitude=${data.longitude}&current=pm2_5,pm10,o3,no2,so2&timezone=auto`;
       const aqiResponse = await fetch(aqiUrl);
       if (aqiResponse.ok) {
         const aqiJson = await aqiResponse.json();
-        if (aqiJson.list && aqiJson.list.length > 0) {
-          const aqiInfo = aqiJson.list[0];
+        if (aqiJson.current) {
+          const pm25 = aqiJson.current.pm2_5 || 0;
+          let aqi = 1;
+          if (pm25 > 250) aqi = 5;
+          else if (pm25 > 150) aqi = 4;
+          else if (pm25 > 55) aqi = 3;
+          else if (pm25 > 35) aqi = 2;
+
           aqiData = {
-            aqi: aqiInfo.main.aqi,
-            components: aqiInfo.components
+            aqi: aqi,
+            pm25: pm25,
+            components: {
+              pm2_5: aqiJson.current.pm2_5,
+              pm10: aqiJson.current.pm10,
+              o3: aqiJson.current.o3,
+              no2: aqiJson.current.no2,
+              so2: aqiJson.current.so2
+            }
           };
         }
       }
@@ -47,15 +60,15 @@ router.get('/visual-crossing', async (req, res) => {
         const humidity = data.currentConditions.humidity || 50;
 
         if (visibility >= 8 && cloudcover <= 30 && humidity <= 60) {
-          return { aqi: 1, label: 'Good' };
+          return { aqi: 1 };
         } else if (visibility >= 5 && cloudcover <= 60 && humidity <= 75) {
-          return { aqi: 2, label: 'Fair' };
+          return { aqi: 2 };
         } else if (visibility >= 2 && cloudcover <= 80 && humidity <= 85) {
-          return { aqi: 3, label: 'Moderate' };
+          return { aqi: 3 };
         } else if (visibility >= 1 && cloudcover <= 95) {
-          return { aqi: 4, label: 'Poor' };
+          return { aqi: 4 };
         } else {
-          return { aqi: 5, label: 'Very Poor' };
+          return { aqi: 5 };
         }
       };
       aqiData = calculateAQI();
