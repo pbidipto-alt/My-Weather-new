@@ -30,14 +30,24 @@ router.get('/visual-crossing', async (req, res) => {
         const aqiJson = await aqiResponse.json();
         if (aqiJson.current) {
           const pm25 = aqiJson.current.pm2_5 || 0;
-          let aqi = 1;
-          if (pm25 > 250) aqi = 5;
-          else if (pm25 > 150) aqi = 4;
-          else if (pm25 > 55) aqi = 3;
-          else if (pm25 > 35) aqi = 2;
+
+          let aqi = 0;
+          if (pm25 <= 12) {
+            aqi = Math.round((pm25 / 12) * 50);
+          } else if (pm25 <= 35.4) {
+            aqi = Math.round(((pm25 - 12) / (35.4 - 12)) * 50 + 50);
+          } else if (pm25 <= 55.4) {
+            aqi = Math.round(((pm25 - 35.5) / (55.4 - 35.5)) * 50 + 100);
+          } else if (pm25 <= 150.4) {
+            aqi = Math.round(((pm25 - 55.5) / (150.4 - 55.5)) * 50 + 150);
+          } else if (pm25 <= 250.4) {
+            aqi = Math.round(((pm25 - 150.5) / (250.4 - 150.5)) * 100 + 200);
+          } else {
+            aqi = Math.round(((pm25 - 250.5) / 500) * 199 + 301);
+          }
 
           aqiData = {
-            aqi: aqi,
+            aqi: Math.min(500, aqi),
             pm25: pm25,
             components: {
               pm2_5: aqiJson.current.pm2_5,
@@ -54,24 +64,7 @@ router.get('/visual-crossing', async (req, res) => {
     }
 
     if (!aqiData) {
-      const calculateAQI = () => {
-        const visibility = data.currentConditions.visibility || 10;
-        const cloudcover = data.currentConditions.cloudcover || 0;
-        const humidity = data.currentConditions.humidity || 50;
-
-        if (visibility >= 8 && cloudcover <= 30 && humidity <= 60) {
-          return { aqi: 1 };
-        } else if (visibility >= 5 && cloudcover <= 60 && humidity <= 75) {
-          return { aqi: 2 };
-        } else if (visibility >= 2 && cloudcover <= 80 && humidity <= 85) {
-          return { aqi: 3 };
-        } else if (visibility >= 1 && cloudcover <= 95) {
-          return { aqi: 4 };
-        } else {
-          return { aqi: 5 };
-        }
-      };
-      aqiData = calculateAQI();
+      aqiData = { aqi: 0 };
     }
 
     const transformedData = {
