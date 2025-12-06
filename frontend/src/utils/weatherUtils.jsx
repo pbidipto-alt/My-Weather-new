@@ -85,12 +85,24 @@ export const prepareDailyChartData = (weatherData) => {
 };
 
 export const getAQIInfo = (aqiValue) => {
-  if (!aqiValue) return { level: "N/A", color: "gray", value: "N/A" };
+  if (aqiValue === null || aqiValue === undefined) {
+    return { level: "N/A", color: "gray", value: "N/A" };
+  }
 
-  if (aqiValue === 1) return { level: "Good", color: "green", value: aqiValue };
-  if (aqiValue === 2) return { level: "Fair", color: "yellow", value: aqiValue };
-  if (aqiValue === 3) return { level: "Moderate", color: "orange", value: aqiValue };
-  if (aqiValue === 4) return { level: "Poor", color: "red", value: aqiValue };
-  if (aqiValue === 5) return { level: "Very Poor", color: "red", value: aqiValue };
-  return { level: "Unknown", color: "gray", value: "N/A" };
+  if (aqiValue <= 50) {
+    return { level: "Good", color: "green", value: aqiValue };
+  }
+  if (aqiValue <= 100) {
+    return { level: "Moderate", color: "yellow", value: aqiValue };
+  }
+  if (aqiValue <= 150) {
+    return { level: "Unhealthy for Sensitive Groups", color: "orange", value: aqiValue };
+  }
+  if (aqiValue <= 200) {
+    return { level: "Unhealthy", color: "red", value: aqiValue };
+  }
+  if (aqiValue <= 300) {
+    return { level: "Very Unhealthy", color: "rose", value: aqiValue };
+  }
+  return { level: "Hazardous", color: "amber", value: aqiValue };
 };
