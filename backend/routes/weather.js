@@ -25,11 +25,15 @@ router.get('/visual-crossing', async (req, res) => {
     let aqiData = null;
     try {
       const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${data.latitude}&longitude=${data.longitude}&current=pm2_5,pm10,o3,no2,so2&timezone=auto`;
+      console.log(`[AQI] Fetching: ${aqiUrl}`);
       const aqiResponse = await fetch(aqiUrl);
+      console.log(`[AQI] Response status: ${aqiResponse.status}`);
       if (aqiResponse.ok) {
         const aqiJson = await aqiResponse.json();
+        console.log(`[AQI] Raw response:`, JSON.stringify(aqiJson).substring(0, 200));
         if (aqiJson.current) {
-          const pm25 = aqiJson.current.pm2_5 || 0;
+          const pm25 = aqiJson.current.pm2_5;
+          console.log(`[AQI] PM2.5 value: ${pm25}`);
 
           let aqi = 0;
           if (pm25 <= 12) {
@@ -46,6 +50,7 @@ router.get('/visual-crossing', async (req, res) => {
             aqi = Math.round(((pm25 - 250.5) / 500) * 199 + 301);
           }
 
+          console.log(`[AQI] Calculated AQI: ${aqi}`);
           aqiData = {
             aqi: Math.min(500, aqi),
             pm25: pm25,
@@ -57,13 +62,18 @@ router.get('/visual-crossing', async (req, res) => {
               so2: aqiJson.current.so2
             }
           };
+        } else {
+          console.log(`[AQI] No current data in response`);
         }
+      } else {
+        console.log(`[AQI] API returned error status`);
       }
     } catch (aqiError) {
-      console.error('AQI fetch error:', aqiError);
+      console.error('[AQI] Fetch error:', aqiError);
     }
 
     if (!aqiData) {
+      console.log(`[AQI] Using fallback: aqi = 0`);
       aqiData = { aqi: 0 };
     }
 
